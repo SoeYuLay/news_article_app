@@ -9,6 +9,6 @@ abstract class ArticleRepository {
 
   //Local
   Future<Either<Failure, void>> saveArticle(Article article);
-  Future<Either<Failure, List<Article>>> getSavedArticles();
+  Stream<Either<Failure, List<Article>>> getSavedArticles();
   Future<Either<Failure, void>> deleteArticle(Article article);
 }

@@ -2,6 +2,7 @@ import 'package:clean_archi_project1/core/error/failure.dart';
 import 'package:clean_archi_project1/features/daily_news/data/data_sources/local/DAO/article_dao.dart';
 import 'package:clean_archi_project1/features/daily_news/data/data_sources/remote/news_api_service.dart';
 import 'package:clean_archi_project1/features/daily_news/data/repository/article_repository_impl.dart';
+import 'package:clean_archi_project1/features/daily_news/domain/entities/article.dart';
 import 'package:clean_archi_project1/features/daily_news/domain/repository/article_repository.dart';
 import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
@@ -118,24 +119,37 @@ void main() {
 
   //success (get saved article)
   test('Get List of Saved Articles Successfully', ()async {
-    when(mockDao.getAllArticles()).thenAnswer((_) async => TestData.testArticleEntity);
+    when(mockDao.getAllArticles()).thenAnswer((_) => Stream.value(TestData.testArticleEntity));
 
-    final result = await articleRepository.getSavedArticles();
+    final stream = articleRepository.getSavedArticles();
 
-    expect(result, isA<Right>());
-    expect((result as Right).value, TestData.testArticle);
+    final result = await stream.first;
 
+    expect(result, isA<Right<Failure, List<Article>>>());
+
+    result.fold(
+          (failure) => fail('Expected Right, got Left: $failure'),
+          (articles) => expect(articles, TestData.testArticle),
+    );
+
+    // 5. Verify DAO call
     verify(mockDao.getAllArticles()).called(1);
   });
 
   //failure (get saved article)
   test('Get List of Saved Articles Failure', ()async {
-    when(mockDao.getAllArticles()).thenThrow(Exception('DB error'));
+    when(mockDao.getAllArticles()).thenAnswer((_) => Stream.error(Exception('DB error')));
 
-    final result = await articleRepository.getSavedArticles();
+    final result = await articleRepository.getSavedArticles().first;
 
-    expect(result, isA<Left>());
-    expect((result as Left).value, isA<CacheFailure>());
+    expect(result, isA<Left<Failure, List<Article>>>());
+    result.fold(
+          (failure) {
+        expect(failure, isA<CacheFailure>());
+        expect(failure.errorMessage, contains('DB error'));
+      },
+          (articles) => fail('Expected Left, got Right'),
+    );
 
     verify(mockDao.getAllArticles()).called(1);
   });

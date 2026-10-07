@@ -76,14 +76,13 @@ class MockArticleDao extends _i1.Mock implements _i5.ArticleDao {
       ) as _i3.Future<void>);
 
   @override
-  _i3.Future<List<_i6.ArticleEntity>> getAllArticles() => (super.noSuchMethod(
+  _i3.Stream<List<_i6.ArticleEntity>> getAllArticles() => (super.noSuchMethod(
         Invocation.method(
           #getAllArticles,
           [],
         ),
-        returnValue:
-            _i3.Future<List<_i6.ArticleEntity>>.value(<_i6.ArticleEntity>[]),
-      ) as _i3.Future<List<_i6.ArticleEntity>>);
+        returnValue: _i3.Stream<List<_i6.ArticleEntity>>.empty(),
+      ) as _i3.Stream<List<_i6.ArticleEntity>>);
 
   @override
   _i3.Future<void> deleteArticle(_i6.ArticleEntity? article) =>

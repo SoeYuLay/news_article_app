@@ -45,7 +45,7 @@ class FakeArticleRepositoryImpl implements ArticleRepository {
   }
   
   @override
-  Future<Either<Failure, List<Article>>> getSavedArticles() {
+  Stream<Either<Failure, List<Article>>> getSavedArticles() {
     // TODO: implement getSavedArticles
     throw UnimplementedError();
   }

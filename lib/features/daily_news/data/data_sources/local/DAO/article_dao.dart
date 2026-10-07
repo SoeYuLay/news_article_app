@@ -7,7 +7,7 @@ abstract class ArticleDao {
   Future<void> insertArticle(ArticleEntity article);
 
   @Query("SELECT * FROM articles")
-  Future<List<ArticleEntity>> getAllArticles();
+  Stream<List<ArticleEntity>> getAllArticles();
 
   @delete
   Future<void> deleteArticle(ArticleEntity article);

@@ -114,7 +114,7 @@ class _$ArticleDao extends ArticleDao {
   _$ArticleDao(
     this.database,
     this.changeListener,
-  )   : _queryAdapter = QueryAdapter(database),
+  )   : _queryAdapter = QueryAdapter(database, changeListener),
         _articleEntityInsertionAdapter = InsertionAdapter(
             database,
             'articles',
@@ -126,7 +126,8 @@ class _$ArticleDao extends ArticleDao {
                   'url': item.url,
                   'publishedAt': item.publishedAt,
                   'content': item.content
-                }),
+                },
+            changeListener),
         _articleEntityDeletionAdapter = DeletionAdapter(
             database,
             'articles',
@@ -139,7 +140,8 @@ class _$ArticleDao extends ArticleDao {
                   'url': item.url,
                   'publishedAt': item.publishedAt,
                   'content': item.content
-                });
+                },
+            changeListener);
 
   final sqflite.DatabaseExecutor database;
 
@@ -152,8 +154,8 @@ class _$ArticleDao extends ArticleDao {
   final DeletionAdapter<ArticleEntity> _articleEntityDeletionAdapter;
 
   @override
-  Future<List<ArticleEntity>> getAllArticles() async {
-    return _queryAdapter.queryList('SELECT * FROM articles',
+  Stream<List<ArticleEntity>> getAllArticles() {
+    return _queryAdapter.queryListStream('SELECT * FROM articles',
         mapper: (Map<String, Object?> row) => ArticleEntity(
             title: row['title'] as String?,
             author: row['author'] as String?,
@@ -161,7 +163,9 @@ class _$ArticleDao extends ArticleDao {
             urlToImage: row['urlToImage'] as String?,
             url: row['url'] as String?,
             publishedAt: row['publishedAt'] as String?,
-            content: row['content'] as String?));
+            content: row['content'] as String?),
+        queryableName: 'articles',
+        isView: false);
   }
 
   @override

@@ -84,16 +84,17 @@ class ArticleRepositoryImpl implements ArticleRepository {
       return Left(CacheFailure(e.toString())); // failure branch
     }
   }
-  
+
   @override
-  Future<Either<Failure, List<Article>>> getSavedArticles() async {
-  try {
-    final entities = await _articleDao.getAllArticles();
-    final articles = entities.map((e) => e.toDomain()).toList();
-    return Right(articles); // success branch
-  } catch (e) {
-    return Left(CacheFailure(e.toString())); // failure branch
-  }
+  Stream<Either<Failure, List<Article>>> getSavedArticles() async* {
+    try {
+      await for (final entities in _articleDao.getAllArticles()) {
+        final articles = entities.map((e) => e.toDomain()).toList();
+        yield Right(articles);
+      }
+    } catch (e) {
+      yield Left(CacheFailure(e.toString()));
+    }
   }
   
   @override
